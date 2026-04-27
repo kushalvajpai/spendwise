@@ -1,0 +1,597 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: var(--color-background-primary);
+  --bg2: var(--color-background-secondary);
+  --bg3: var(--color-background-tertiary);
+  --text: var(--color-text-primary);
+  --text2: var(--color-text-secondary);
+  --text3: var(--color-text-tertiary);
+  --border: var(--color-border-tertiary);
+  --border2: var(--color-border-secondary);
+  --radius: var(--border-radius-lg);
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-dark: #085041;
+  --coral: #D85A30;
+  --coral-light: #FAECE7;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+}
+
+body { font-family: var(--font-sans, system-ui, sans-serif); background: var(--bg3); color: var(--text); min-height: 100vh; }
+
+.screen { display: none; animation: fadeIn 0.4s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* AUTH PAGES */
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.auth-card {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(32px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+.auth-logo-icon { width: 40px; height: 40px; background: var(--teal); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.auth-logo-icon svg { width: 22px; height: 22px; fill: white; }
+.auth-logo-text { font-size: 20px; font-weight: 500; }
+.auth-logo-text span { color: var(--teal); }
+
+.auth-title { font-size: 22px; font-weight: 500; margin-bottom: 0.25rem; }
+.auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.form-group input {
+  width: 100%; padding: 10px 12px; border: 0.5px solid var(--border2);
+  border-radius: var(--border-radius-md); background: var(--bg2); color: var(--text);
+  font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
+}
+.form-group input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+
+.btn-primary {
+  width: 100%; padding: 11px; background: var(--teal); color: white;
+  border: none; border-radius: var(--border-radius-md); font-size: 15px;
+  font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.1s;
+  font-family: inherit; margin-top: 0.5rem;
+}
+.btn-primary:hover { background: #0F6E56; }
+.btn-primary:active { transform: scale(0.98); }
+
+.auth-switch { text-align: center; margin-top: 1.5rem; font-size: 14px; color: var(--text2); }
+.auth-switch a { color: var(--teal); cursor: pointer; text-decoration: none; font-weight: 500; }
+.auth-switch a:hover { text-decoration: underline; }
+
+.error-msg { background: var(--coral-light); color: var(--coral); border-radius: 6px; padding: 8px 12px; font-size: 13px; margin-bottom: 1rem; display: none; }
+.error-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+/* DASHBOARD */
+.dash-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+.sidebar {
+  background: var(--bg);
+  border-right: 0.5px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 0 1.25rem 1.5rem; border-bottom: 0.5px solid var(--border); margin-bottom: 1rem; }
+.sidebar-logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.sidebar-logo-icon svg { width: 17px; height: 17px; fill: white; }
+.sidebar-logo-text { font-size: 16px; font-weight: 500; }
+.sidebar-logo-text span { color: var(--teal); }
+
+.nav-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 0 1.25rem; margin: 1rem 0 0.5rem; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 1.25rem; font-size: 14px; cursor: pointer;
+  transition: background 0.15s; color: var(--text2); border-radius: 0;
+}
+.nav-item:hover { background: var(--bg2); color: var(--text); }
+.nav-item.active { background: var(--teal-light); color: var(--teal-dark); font-weight: 500; }
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.sidebar-bottom { padding: 1rem 1.25rem; border-top: 0.5px solid var(--border); margin-top: auto; }
+.user-chip { display: flex; align-items: center; gap: 10px; }
+.user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-email { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.logout-btn { font-size: 12px; color: var(--coral); cursor: pointer; margin-top: 8px; }
+.logout-btn:hover { text-decoration: underline; }
+
+/* MAIN */
+.main-area { padding: 2rem; overflow-y: auto; }
+.page-header { margin-bottom: 2rem; }
+.page-header h1 { font-size: 22px; font-weight: 500; }
+.page-header p { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--bg2); border-radius: var(--border-radius-md); padding: 1rem;
+  animation: countUp 0.6s ease;
+}
+@keyframes countUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+.stat-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.stat-value { font-size: 22px; font-weight: 500; }
+.stat-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.stat-value.teal { color: var(--teal); }
+.stat-value.coral { color: var(--coral); }
+.stat-value.amber { color: var(--amber); }
+
+/* CARDS */
+.card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.card-title { font-size: 15px; font-weight: 500; }
+
+/* ADD EXPENSE FORM */
+.expense-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.expense-form .form-group { margin-bottom: 0; }
+.expense-form .span2 { grid-column: span 2; }
+.btn-add {
+  padding: 9px 18px; background: var(--teal); color: white; border: none;
+  border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.1s;
+}
+.btn-add:hover { background: #0F6E56; }
+.btn-add:active { transform: scale(0.98); }
+
+/* EXPENSE LIST */
+.expense-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+.expense-item:last-child { border-bottom: none; }
+.expense-cat-icon {
+  width: 38px; height: 38px; border-radius: var(--border-radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.expense-info { flex: 1; min-width: 0; }
+.expense-name { font-size: 14px; font-weight: 500; }
+.expense-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.expense-amount { font-size: 15px; font-weight: 500; color: var(--coral); flex-shrink: 0; }
+.expense-del { width: 26px; height: 26px; border-radius: 6px; border: 0.5px solid var(--border2); background: none; cursor: pointer; color: var(--text3); font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+.expense-del:hover { background: var(--coral-light); color: var(--coral); border-color: var(--coral); }
+
+/* BUDGET BARS */
+.budget-item { margin-bottom: 1rem; }
+.budget-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+.budget-bar-bg { height: 8px; background: var(--bg2); border-radius: 99px; overflow: hidden; }
+.budget-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.16,1,0.3,1); }
+
+/* CHART (CSS only) */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 1rem; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.7s cubic-bezier(0.16,1,0.3,1); min-height: 4px; }
+.bar-lbl { font-size: 11px; color: var(--text3); }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text3); }
+.empty-state .big { font-size: 40px; margin-bottom: 8px; }
+.empty-state p { font-size: 14px; }
+
+/* BADGE */
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: var(--border-radius-md); margin-bottom: 1.5rem; }
+.tab { flex: 1; padding: 7px; text-align: center; font-size: 13px; cursor: pointer; border-radius: 6px; transition: background 0.15s, color 0.15s; color: var(--text2); }
+.tab.active { background: var(--bg); color: var(--text); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+select.form-group {
+  width: 100%; padding: 10px 12px; border: 0.5px solid var(--border2);
+  border-radius: var(--border-radius-md); background: var(--bg2); color: var(--text);
+  font-size: 14px; font-family: inherit; outline: none; appearance: none;
+}
+</style>
+
+<h2 class="sr-only">Student Expense Manager — sign up, log in, and track your spending</h2>
+
+<!-- SIGNUP SCREEN -->
+<div id="screen-signup" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
+        <div class="auth-logo-text">Spend<span>Wise</span></div>
+      </div>
+      <div class="auth-title">Create your account</div>
+      <div class="auth-sub">Track every rupee, stress-free</div>
+      <div id="signup-error" class="error-msg"></div>
+      <div class="form-group"><label>Full name</label><input id="su-name" type="text" placeholder="Kuzhal Singh"></div>
+      <div class="form-group"><label>Email</label><input id="su-email" type="email" placeholder="you@college.edu"></div>
+      <div class="form-group"><label>Monthly budget (₹)</label><input id="su-budget" type="number" placeholder="5000"></div>
+      <div class="form-group"><label>Password</label><input id="su-pass" type="password" placeholder="Min 6 characters"></div>
+      <button class="btn-primary" onclick="doSignup()">Create account</button>
+      <div class="auth-switch">Already have an account? <a onclick="showScreen('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div id="screen-login" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
+        <div class="auth-logo-text">Spend<span>Wise</span></div>
+      </div>
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your expense tracker</div>
+      <div id="login-error" class="error-msg"></div>
+      <div class="form-group"><label>Email</label><input id="li-email" type="email" placeholder="you@college.edu"></div>
+      <div class="form-group"><label>Password</label><input id="li-pass" type="password" placeholder="Your password"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign in</button>
+      <div class="auth-switch">No account yet? <a onclick="showScreen('signup')">Sign up free</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="screen-dashboard" class="screen">
+  <div class="dash-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
+        <div class="sidebar-logo-text">Spend<span>Wise</span></div>
+      </div>
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="showTab('overview')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" onclick="showTab('expenses')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        Add Expense
+      </div>
+      <div class="nav-item" onclick="showTab('budget')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        Budget
+      </div>
+      <div class="nav-item" onclick="showTab('history')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        History
+      </div>
+      <div style="flex:1"></div>
+      <div class="sidebar-bottom">
+        <div class="user-chip">
+          <div class="user-avatar" id="sidebar-avatar">KS</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-name">Kuzhal</div>
+            <div class="user-email" id="sidebar-email">k@college.edu</div>
+          </div>
+        </div>
+        <div class="logout-btn" onclick="doLogout()">Sign out</div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-area">
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-panel active">
+        <div class="page-header">
+          <h1 id="greeting">Good morning! 👋</h1>
+          <p>Here's your spending summary for this month</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total spent</div>
+            <div class="stat-value coral" id="stat-spent">₹0</div>
+            <div class="stat-sub">this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Remaining budget</div>
+            <div class="stat-value teal" id="stat-remaining">₹5,000</div>
+            <div class="stat-sub">of budget</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value" id="stat-count">0</div>
+            <div class="stat-sub">expenses logged</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Daily average</div>
+            <div class="stat-value amber" id="stat-avg">₹0</div>
+            <div class="stat-sub">per day</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Spending by category</div></div>
+          <div class="bar-chart" id="bar-chart">
+            <div class="bar-col"><div class="bar-fill" style="background:var(--teal);height:4px" id="bar-food"></div><div class="bar-lbl">Food</div></div>
+            <div class="bar-col"><div class="bar-fill" style="background:var(--purple);height:4px" id="bar-transport"></div><div class="bar-lbl">Travel</div></div>
+            <div class="bar-col"><div class="bar-fill" style="background:var(--amber);height:4px" id="bar-study"></div><div class="bar-lbl">Study</div></div>
+            <div class="bar-col"><div class="bar-fill" style="background:var(--coral);height:4px" id="bar-entertainment"></div><div class="bar-lbl">Fun</div></div>
+            <div class="bar-col"><div class="bar-fill" style="background:#9FE1CB;height:4px" id="bar-health"></div><div class="bar-lbl">Health</div></div>
+            <div class="bar-col"><div class="bar-fill" style="background:#B5D4F4;height:4px" id="bar-other"></div><div class="bar-lbl">Other</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent expenses</div></div>
+          <div id="recent-list"><div class="empty-state"><div class="big">💸</div><p>No expenses yet. Add your first one!</p></div></div>
+        </div>
+      </div>
+
+      <!-- ADD EXPENSE TAB -->
+      <div id="tab-expenses" class="tab-panel">
+        <div class="page-header"><h1>Add expense</h1><p>Log a new spending item</p></div>
+        <div class="card">
+          <div class="expense-form" id="exp-form">
+            <div class="form-group span2"><label>Description</label><input id="exp-desc" type="text" placeholder="e.g. Lunch at canteen"></div>
+            <div class="form-group"><label>Amount (₹)</label><input id="exp-amount" type="number" placeholder="0"></div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="exp-cat" style="width:100%;padding:10px 12px;border:0.5px solid var(--border2);border-radius:var(--border-radius-md);background:var(--bg2);color:var(--text);font-size:14px;font-family:inherit;outline:none;">
+                <option value="food">🍛 Food & Dining</option>
+                <option value="transport">🚌 Transport</option>
+                <option value="study">📚 Study & Books</option>
+                <option value="entertainment">🎮 Entertainment</option>
+                <option value="health">💊 Health</option>
+                <option value="other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Date</label><input id="exp-date" type="date"></div>
+            <div class="form-group span2" style="text-align:right">
+              <button class="btn-add" onclick="addExpense()">+ Add expense</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUDGET TAB -->
+      <div id="tab-budget" class="tab-panel">
+        <div class="page-header"><h1>Budget overview</h1><p>See how you're spending across categories</p></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Monthly budget</div>
+            <span style="font-size:13px;color:var(--text2)">Total: <strong id="bud-total">₹5,000</strong></span>
+          </div>
+          <div id="budget-bars"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Update monthly budget</div></div>
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div class="form-group" style="flex:1;margin:0"><label>New budget (₹)</label><input id="new-budget" type="number" placeholder="5000"></div>
+            <button class="btn-add" onclick="updateBudget()">Update</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div id="tab-history" class="tab-panel">
+        <div class="page-header"><h1>Expense history</h1><p>All your logged expenses</p></div>
+        <div class="card">
+          <div id="all-expenses-list"><div class="empty-state"><div class="big">📋</div><p>No expenses yet</p></div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+let users = JSON.parse(localStorage.getItem('sw_users') || '[]');
+let currentUser = JSON.parse(localStorage.getItem('sw_current') || 'null');
+
+const catIcons = { food:'🍛', transport:'🚌', study:'📚', entertainment:'🎮', health:'💊', other:'📦' };
+const catColors = { food:'#E1F5EE', transport:'#EEEDFE', study:'#FAEEDA', entertainment:'#FAECE7', health:'#9FE1CB', other:'#B5D4F4' };
+const catNames = { food:'Food & Dining', transport:'Transport', study:'Study & Books', entertainment:'Entertainment', health:'Health', other:'Other' };
+
+function save() { localStorage.setItem('sw_users', JSON.stringify(users)); }
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const map = {overview:0, expenses:1, budget:2, history:3};
+  if(map[name] !== undefined) items[map[name]].classList.add('active');
+  if(name === 'overview') renderOverview();
+  if(name === 'budget') renderBudget();
+  if(name === 'history') renderHistory();
+}
+
+function doSignup() {
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim().toLowerCase();
+  const budget = parseFloat(document.getElementById('su-budget').value) || 5000;
+  const pass = document.getElementById('su-pass').value;
+  const err = document.getElementById('signup-error');
+  if(!name || !email || !pass) { showError(err, 'Please fill all fields'); return; }
+  if(pass.length < 6) { showError(err, 'Password must be at least 6 characters'); return; }
+  if(users.find(u => u.email === email)) { showError(err, 'Account with this email already exists'); return; }
+  const user = { name, email, pass, budget, expenses: [] };
+  users.push(user);
+  save();
+  loginUser(user);
+}
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const pass = document.getElementById('li-pass').value;
+  const err = document.getElementById('login-error');
+  const user = users.find(u => u.email === email && u.pass === pass);
+  if(!user) { showError(err, 'Invalid email or password'); return; }
+  loginUser(user);
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('sw_current', JSON.stringify(user));
+  const initials = user.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sidebar-avatar').textContent = initials;
+  document.getElementById('sidebar-name').textContent = user.name.split(' ')[0];
+  document.getElementById('sidebar-email').textContent = user.email;
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = g + ', ' + user.name.split(' ')[0] + '! 👋';
+  document.getElementById('exp-date').value = new Date().toISOString().split('T')[0];
+  showScreen('dashboard');
+  renderOverview();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('sw_current');
+  showScreen('signup');
+}
+
+function showError(el, msg) {
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+function getUserData() {
+  const idx = users.findIndex(u => u.email === currentUser.email);
+  return { idx, user: users[idx] };
+}
+
+function addExpense() {
+  const desc = document.getElementById('exp-desc').value.trim();
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const cat = document.getElementById('exp-cat').value;
+  const date = document.getElementById('exp-date').value;
+  if(!desc || !amount || amount <= 0) { alert('Please enter a description and valid amount'); return; }
+  const { idx, user } = getUserData();
+  user.expenses.unshift({ id: Date.now(), desc, amount, cat, date: date || new Date().toISOString().split('T')[0] });
+  currentUser = user;
+  localStorage.setItem('sw_current', JSON.stringify(user));
+  save();
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-amount').value = '';
+  showTab('overview');
+}
+
+function deleteExpense(id) {
+  const { idx, user } = getUserData();
+  user.expenses = user.expenses.filter(e => e.id !== id);
+  currentUser = user;
+  localStorage.setItem('sw_current', JSON.stringify(user));
+  save();
+  renderOverview();
+  renderHistory();
+  renderBudget();
+}
+
+function updateBudget() {
+  const val = parseFloat(document.getElementById('new-budget').value);
+  if(!val || val <= 0) { alert('Enter a valid budget'); return; }
+  const { idx, user } = getUserData();
+  user.budget = val;
+  currentUser = user;
+  localStorage.setItem('sw_current', JSON.stringify(user));
+  save();
+  renderBudget();
+  renderOverview();
+}
+
+function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+function renderOverview() {
+  if(!currentUser) return;
+  const { user } = getUserData();
+  const exps = user.expenses || [];
+  const total = exps.reduce((s, e) => s + e.amount, 0);
+  const rem = user.budget - total;
+  document.getElementById('stat-spent').textContent = fmt(total);
+  document.getElementById('stat-remaining').textContent = fmt(Math.max(0, rem));
+  document.getElementById('stat-count').textContent = exps.length;
+  document.getElementById('stat-avg').textContent = fmt(exps.length ? total / 30 : 0);
+
+  const catTotals = {};
+  exps.forEach(e => { catTotals[e.cat] = (catTotals[e.cat] || 0) + e.amount; });
+  const maxCat = Math.max(1, ...Object.values(catTotals));
+  ['food','transport','study','entertainment','health','other'].forEach(c => {
+    const bar = document.getElementById('bar-' + c);
+    if(bar) bar.style.height = Math.max(4, ((catTotals[c]||0)/maxCat)*110) + 'px';
+  });
+
+  const list = document.getElementById('recent-list');
+  const recent = exps.slice(0, 5);
+  if(!recent.length) { list.innerHTML = '<div class="empty-state"><div class="big">💸</div><p>No expenses yet. Add your first one!</p></div>'; return; }
+  list.innerHTML = recent.map(e => expenseHTML(e)).join('');
+}
+
+function renderHistory() {
+  if(!currentUser) return;
+  const { user } = getUserData();
+  const exps = user.expenses || [];
+  const list = document.getElementById('all-expenses-list');
+  if(!exps.length) { list.innerHTML = '<div class="empty-state"><div class="big">📋</div><p>No expenses yet</p></div>'; return; }
+  list.innerHTML = exps.map(e => expenseHTML(e)).join('');
+}
+
+function renderBudget() {
+  if(!currentUser) return;
+  const { user } = getUserData();
+  const exps = user.expenses || [];
+  document.getElementById('bud-total').textContent = fmt(user.budget);
+  const catTotals = {};
+  exps.forEach(e => { catTotals[e.cat] = (catTotals[e.cat] || 0) + e.amount; });
+  const cats = ['food','transport','study','entertainment','health','other'];
+  const colMap = { food:'var(--teal)', transport:'var(--purple)', study:'var(--amber)', entertainment:'var(--coral)', health:'#1D9E75', other:'#378ADD' };
+  let html = '';
+  cats.forEach(c => {
+    const spent = catTotals[c] || 0;
+    const alloc = user.budget / cats.length;
+    const pct = Math.min(100, Math.round((spent / alloc) * 100));
+    const over = spent > alloc;
+    html += `<div class="budget-item">
+      <div class="budget-row">
+        <span>${catIcons[c]} ${catNames[c]}</span>
+        <span style="color:${over?'var(--coral)':'var(--text2)'}">${fmt(spent)} <span style="color:var(--text3);font-size:11px">/ ${fmt(alloc)}</span></span>
+      </div>
+      <div class="budget-bar-bg">
+        <div class="budget-bar-fill" style="width:${pct}%;background:${over?'var(--coral)':colMap[c]}"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('budget-bars').innerHTML = html;
+}
+
+function expenseHTML(e) {
+  return `<div class="expense-item">
+    <div class="expense-cat-icon" style="background:${catColors[e.cat]}">${catIcons[e.cat]}</div>
+    <div class="expense-info">
+      <div class="expense-name">${e.desc}</div>
+      <div class="expense-meta">${catNames[e.cat]} · ${e.date}</div>
+    </div>
+    <div class="expense-amount">${fmt(e.amount)}</div>
+    <button class="expense-del" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
+  </div>`;
+}
+
+if(currentUser) {
+  const found = users.find(u => u.email === currentUser.email);
+  if(found) loginUser(found);
+  else showScreen('signup');
+} else {
+  showScreen('signup');
+}
+</script>
